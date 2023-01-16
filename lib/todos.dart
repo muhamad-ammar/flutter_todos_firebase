@@ -19,7 +19,7 @@ class _TodosState extends State<Todos> {
     // Map
     Map<String, String> todos = {'todoTitle': input};
     documentReference.set(todos).whenComplete(() {
-      print(input);
+
     });
   }
 
@@ -63,6 +63,8 @@ class _TodosState extends State<Todos> {
                         createTodos();
                         Navigator.of(context).pop();
                         input = '';
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Todo Added')));
+
                       },
                       child: Text("Add"),
                     )
@@ -78,6 +80,17 @@ class _TodosState extends State<Todos> {
       body: StreamBuilder(
         stream: FirebaseFirestore.instance.collection("MyTodoList").snapshots(),
         builder: (context, snapshots) {
+          if (snapshots.data == null)
+          {
+            return Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+          else{
+            if(snapshots.data!.docs.length==0)
+            {
+              return Center(child: Text('There is no Todo in the List'),);
+            }else{
           return ListView.builder(
               itemCount: snapshots.data!.docs.length,
               itemBuilder: (context, int index) {
@@ -87,6 +100,8 @@ class _TodosState extends State<Todos> {
                   return Dismissible(
                       onDismissed: (direction) {
                         deleteTodos(documentSnapshot['todoTitle']);
+                        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Todo Deleted')));
+
                       },
                       key: Key(documentSnapshot['todoTitle']),
                       child: Card(
@@ -99,12 +114,14 @@ class _TodosState extends State<Todos> {
                             ),
                             onPressed: () {
                               deleteTodos(documentSnapshot['todoTitle']);
+                              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: const Text('Todo Deleted')));
+
                             },
                           ),
                         ),
                       ));
                 }
-              });
+              });}}
         },
       ),
     );
