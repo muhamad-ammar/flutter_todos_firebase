@@ -13,19 +13,18 @@ class _TodosState extends State<Todos> {
   String input = '';
 
   createTodos() {
-    DocumentReference documentReference = FirebaseFirestore.instance
-        .collection('MyTodoList')
-        .doc(input); //.document(input);
+    DocumentReference documentReference =
+        FirebaseFirestore.instance.collection('MyTodoList').document(input);
     // Map
     Map<String, String> todos = {'todoTitle': input};
-    documentReference.set(todos).whenComplete(() {
+    documentReference.setdata(todos).whenComplete(() {
       print(input);
     });
   }
 
   deleteTodos(item) {
     DocumentReference documentReference =
-        FirebaseFirestore.instance.collection('MyTodoList').doc(item);
+        FirebaseFirestore.instance.collection('MyTodoList').document(item);
     // Map
     documentReference.delete().whenComplete(() {
       print(item);
@@ -79,11 +78,11 @@ class _TodosState extends State<Todos> {
         stream: FirebaseFirestore.instance.collection("MyTodoList").snapshots(),
         builder: (context, snapshots) {
           return ListView.builder(
-              itemCount: snapshots.data!.docs.length,
+              itemCount: snapshots.data.documents .length,
               itemBuilder: (context, int index) {
                 {
                   DocumentSnapshot documentSnapshot =
-                      snapshots.data!.docs[index];
+                      snapshots.data.documents[index];
                   return Dismissible(
                       onDismissed: (direction) {
                         deleteTodos(documentSnapshot['todoTitle']);
